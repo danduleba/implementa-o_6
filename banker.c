@@ -23,3 +23,8 @@ int calcular_necessidade(int maximo, int alocado)
 {
     return maximo - alocado;
 }
+static void erro(const char *mensagem)
+{
+    fprintf(stderr, "Erro: %s\n", mensagem);
+    exit(EXIT_FAILURE);
+}
