@@ -276,6 +276,54 @@ void devolver(Banco *banco, FILE *saida, size_t cliente,
     fputc('\n', saida);
 }
 
+static void processar_comandos(Banco *banco, FILE *entrada, FILE *saida)
+{
+
+    char *linha = NULL;
+    size_t capacidade = 0;
+
+    int *valores = alocar(banco->recursos, sizeof *valores);
+
+    while (ler_linha(entrada, &linha, &capacidade)) {
+        char *p = pular_espacos(linha);
+
+        if (*p == '*' && *pular_espacos(p + 1) == '\0') {
+            mostrar_estado_inicial(banco, saida);
+            continue;
+        }
+
+        if (strncmp(p, "RQ", 2) != 0 && strncmp(p, "RL", 2) != 0)
+            erro("comando inválido em commands.txt");
+
+        char operacao = p[1];
+        p += 2;
+
+        if (!isspace((unsigned char)*p))
+            erro("separe os campos do comando por espaços");
+
+        size_t cliente = (size_t)ler_inteiro(&p);
+        if (cliente >= banco->clientes)
+            erro("cliente inexistente em commands.txt");
+
+        for (size_t recurso = 0; recurso < banco->recursos; recurso++) {
+            if (!isspace((unsigned char)*p))
+                erro("separe os campos do comando por espaços");
+            valores[recurso] = ler_inteiro(&p);
+        }
+
+        if (*pular_espacos(p) != '\0')
+            erro("quantidade de valores incorreta em commands.txt");
+
+        if (operacao == 'Q')
+            solicitar(banco, saida, cliente, valores);
+        else
+            devolver(banco, saida, cliente, valores);
+    }
+
+    free(valores);
+    free(linha);
+}
+
 int main(int argc, char **argv)
 {
     if (argc < 2)
@@ -295,13 +343,19 @@ int main(int argc, char **argv)
     carregar_clientes(&banco, clientes);
     fclose(clientes);
 
-    mostrar_estado_inicial(&banco, stdout);
+    FILE *entrada = abrir("commands.txt", "r");
+    FILE *saida = abrir("result.txt", "w");
 
-    if (estado_seguro(&banco)) {
-        puts("Estado inicial seguro.");
-    } else {
-        puts("Estado inicial inseguro.");
-    }
+    processar_comandos(&banco, entrada, saida);
+
+    int falha_entrada = fclose(entrada);
+    int falha_saida = ferror(saida);
+    int fechamento_saida = fclose(saida);
+
+    if (falha_entrada != 0)
+        erro("falha ao fechar commands.txt");
+    if (falha_saida || fechamento_saida != 0)
+        erro("falha ao gravar result.txt");
 
     free(banco.alocado);
     free(banco.maximo);
