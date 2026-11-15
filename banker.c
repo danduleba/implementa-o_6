@@ -127,6 +127,64 @@ static void carregar_clientes(Banco *banco, FILE *arquivo)
     free(linha);
 }
 
+static bool estado_seguro(const Banco *banco)
+{
+
+    int *trabalho = alocar(banco->recursos, sizeof *trabalho);
+
+    bool *terminou = alocar(banco->clientes, sizeof *terminou);
+
+    memcpy(trabalho, banco->disponivel,
+           banco->recursos * sizeof *trabalho);
+
+    size_t concluidos = 0;
+
+    bool avancou;
+
+    do {
+
+        avancou = false;
+
+        for (size_t cliente = 0; cliente < banco->clientes; cliente++) {
+
+            if (terminou[cliente])
+                continue;
+
+            size_t base = cliente * banco->recursos;
+
+            size_t recurso = 0;
+
+            while (recurso < banco->recursos &&
+                   calcular_necessidade(banco->maximo[base + recurso],
+                                        banco->alocado[base + recurso])
+                       <= trabalho[recurso]) {
+
+                recurso++;
+            }
+
+            if (recurso != banco->recursos)
+                continue;
+
+            for (recurso = 0; recurso < banco->recursos; recurso++) {
+
+                trabalho[recurso] += banco->alocado[base + recurso];
+            }
+
+            terminou[cliente] = true;
+
+            concluidos++;
+
+            avancou = true;
+        }
+
+    } while (avancou && concluidos < banco->clientes);
+
+    free(trabalho);
+    free(terminou);
+
+    return concluidos == banco->clientes;
+}
+
 static void escrever_vetor(FILE *saida, const int *valores, size_t quantidade)
 {
     for (size_t i = 0; i < quantidade; i++)
@@ -174,6 +232,12 @@ int main(int argc, char **argv)
     fclose(clientes);
 
     mostrar_estado_inicial(&banco, stdout);
+
+    if (estado_seguro(&banco)) {
+        puts("Estado inicial seguro.");
+    } else {
+        puts("Estado inicial inseguro.");
+    }
 
     free(banco.alocado);
     free(banco.maximo);
