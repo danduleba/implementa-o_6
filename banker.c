@@ -131,19 +131,15 @@ static bool estado_seguro(const Banco *banco)
 {
 
     int *trabalho = alocar(banco->recursos, sizeof *trabalho);
-
     bool *terminou = alocar(banco->clientes, sizeof *terminou);
 
-    memcpy(trabalho, banco->disponivel,
-           banco->recursos * sizeof *trabalho);
+    for (size_t recurso = 0; recurso < banco->recursos; recurso++)
+        trabalho[recurso] = banco->disponivel[recurso];
 
     size_t concluidos = 0;
 
-    bool avancou;
-
-    do {
-
-        avancou = false;
+    while (concluidos < banco->clientes) {
+        bool avancou = false;
 
         for (size_t cliente = 0; cliente < banco->clientes; cliente++) {
 
@@ -151,33 +147,31 @@ static bool estado_seguro(const Banco *banco)
                 continue;
 
             size_t base = cliente * banco->recursos;
+            bool pode_terminar = true;
 
-            size_t recurso = 0;
-
-            while (recurso < banco->recursos &&
-                   calcular_necessidade(banco->maximo[base + recurso],
-                                        banco->alocado[base + recurso])
-                       <= trabalho[recurso]) {
-
-                recurso++;
+            for (size_t recurso = 0; recurso < banco->recursos; recurso++) {
+                int falta = calcular_necessidade(banco->maximo[base + recurso],
+                                                 banco->alocado[base + recurso]);
+                if (falta > trabalho[recurso]) {
+                    pode_terminar = false;
+                    break;
+                }
             }
 
-            if (recurso != banco->recursos)
+            if (!pode_terminar)
                 continue;
 
-            for (recurso = 0; recurso < banco->recursos; recurso++) {
-
+            for (size_t recurso = 0; recurso < banco->recursos; recurso++)
                 trabalho[recurso] += banco->alocado[base + recurso];
-            }
 
             terminou[cliente] = true;
-
             concluidos++;
-
             avancou = true;
         }
 
-    } while (avancou && concluidos < banco->clientes);
+        if (!avancou)
+            break;
+    }
 
     free(trabalho);
     free(terminou);
