@@ -206,6 +206,76 @@ static void mostrar_estado_inicial(const Banco *banco, FILE *saida)
     fputs(" \n", saida);
 }
 
+void solicitar(Banco *banco, FILE *saida, size_t cliente,
+                      const int *valores)
+{
+
+    size_t base = cliente * banco->recursos;
+
+    for (size_t recurso = 0; recurso < banco->recursos; recurso++) {
+        int falta = calcular_necessidade(banco->maximo[base + recurso],
+                                         banco->alocado[base + recurso]);
+        if (valores[recurso] > falta) {
+            fprintf(saida, "The customer %zu request ", cliente);
+            escrever_vetor(saida, valores, banco->recursos);
+            fputs(" was denied because exceed its maximum allocation\n", saida);
+            return;
+        }
+    }
+
+    for (size_t recurso = 0; recurso < banco->recursos; recurso++) {
+        if (valores[recurso] > banco->disponivel[recurso]) {
+            fputs("The resources ", saida);
+            escrever_vetor(saida, banco->disponivel, banco->recursos);
+            fprintf(saida, " are not enough to customer %zu request ", cliente);
+            escrever_vetor(saida, valores, banco->recursos);
+            fputs(" \n", saida);
+            return;
+        }
+    }
+
+    for (size_t recurso = 0; recurso < banco->recursos; recurso++) {
+        banco->disponivel[recurso] -= valores[recurso];
+        banco->alocado[base + recurso] += valores[recurso];
+    }
+
+    if (!estado_seguro(banco)) {
+
+        for (size_t recurso = 0; recurso < banco->recursos; recurso++) {
+            banco->disponivel[recurso] += valores[recurso];
+            banco->alocado[base + recurso] -= valores[recurso];
+        }
+        fprintf(saida, "The customer %zu request ", cliente);
+        escrever_vetor(saida, valores, banco->recursos);
+        fputs(" was denied because result in an unsafe state\n", saida);
+        return;
+    }
+
+    fprintf(saida, "Allocate to customer %zu the resources ", cliente);
+    escrever_vetor(saida, valores, banco->recursos);
+    fputc('\n', saida);
+}
+
+void devolver(Banco *banco, FILE *saida, size_t cliente,
+                     const int *valores)
+{
+    size_t base = cliente * banco->recursos;
+
+    for (size_t recurso = 0; recurso < banco->recursos; recurso++) {
+        if (valores[recurso] > banco->alocado[base + recurso])
+            erro("RL tenta devolver mais recursos do que o cliente possui");
+    }
+
+    for (size_t recurso = 0; recurso < banco->recursos; recurso++) {
+        banco->alocado[base + recurso] -= valores[recurso];
+        banco->disponivel[recurso] += valores[recurso];
+    }
+
+    fprintf(saida, "Release from customer %zu the resources ", cliente);
+    escrever_vetor(saida, valores, banco->recursos);
+    fputc('\n', saida);
+}
+
 int main(int argc, char **argv)
 {
     if (argc < 2)
