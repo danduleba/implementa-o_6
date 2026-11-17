@@ -1,0 +1,2034 @@
+Script started on 2026-11-15 18:52:56-03:00 [COMMAND="bash testes/executar_testes.sh " <not executed on terminal>]
++ date --iso-8601=seconds
+2026-11-15T18:52:56-03:00
++ uname -sr
+Linux 6.18.58.1-microsoft-standard-WSL2
++ gcc --version
++ head -n 1
+gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0
++ sha256sum banker.c Makefile testes/testar_banker.py
+c845830c31accfed749b982dfecf7a9a19b11a00fb2f764a7dece99296d4bd25  banker.c
+cfa2c73440fd3292a49ecc7599bd910b6880c5294263962f84d2ebd6a93d3920  Makefile
+62aa0c630ecd66da4b19111366ec878736cc4dc3a70ce03d4b1d8fee938d497d  testes/testar_banker.py
++ make clean
+rm -f banker
++ make
+gcc -std=c11 -Wall -Wextra -Wpedantic banker.c -o banker
++ ./banker 10 5 7
++ cmp result.txt testes/dados/result_esperado.txt
++ printf 'PASS: resultado do exemplo identico ao arquivo fornecido pelo professor.\n'
+PASS: resultado do exemplo identico ao arquivo fornecido pelo professor.
++ cat result.txt
+Allocate to customer 0 the resources 0 2 1
+Allocate to customer 2 the resources 3 0 2
+Allocate to customer 1 the resources 2 0 0
+Allocate to customer 4 the resources 0 0 2
+Release from customer 0 the resources 0 1 1
+Allocate to customer 3 the resources 2 1 1
+MAXIMUM   |   ALLOCATION  |   NEED
+7 5 3     |   0 1 0       |   7 4 3 
+3 2 2     |   2 0 0       |   1 2 2 
+9 0 2     |   3 0 2       |   6 0 0 
+2 2 2     |   2 1 1       |   0 1 1 
+4 3 3     |   0 0 2       |   4 3 1 
+AVAILABLE 3 3 2 
+The resources 3 3 2 are not enough to customer 4 request 4 0 0 
+Allocate to customer 1 the resources 1 0 2
+The customer 0 request 0 2 0 was denied because result in an unsafe state
+The customer 2 request 0 1 0 was denied because exceed its maximum allocation
++ make testar
+python3 testes/testar_banker.py
+Compilacao de verificacao: make com -Werror e UndefinedBehaviorSanitizer.
+PASS: compilacao sem avisos.
+[001] PASS: professor byte a byte
+  Comando: ./banker 10 5 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a8a6da37fc44011d184523b49970e24e760e663d16a997e20294cf164c09599f
+PASS: ./banker 10 5 7 gera result.txt identico ao fornecido pelo professor.
+[002] PASS: recusa insegura e restaura saldo
+  Comando: ./banker 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 82251d574c28b62ef44b6d7cab3380eb47d82b13925c909813123ff52d67432b
+[003] PASS: INT_MAX e devolucao integral
+  Comando: ./banker 2147483647
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 86e15c7da27785ff69043d4a5b1729e95c2d155b80424fa035d4900eb5fd8854
+[004] PASS: CRLF, tabulacoes e zero
+  Comando: ./banker 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 8a34fc9af9c5ca1740b2a70949283676277309b8ddd21d5e9806d35f43ed5686
+[005] PASS: sem comandos
+  Comando: ./banker 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+[006] PASS: comando invalido b'\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: comando inválido em commands.txt
+[007] PASS: comando invalido b'R'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: comando inválido em commands.txt
+[008] PASS: comando invalido b'RQ'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: separe os campos do comando por espaços
+[009] PASS: comando invalido b'RQ0 1\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: separe os campos do comando por espaços
+[010] PASS: comando invalido b'RQ 0\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[011] PASS: comando invalido b'RQ 0 1 2\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: quantidade de valores incorreta em commands.txt
+[012] PASS: comando invalido b'RQ 0 1x\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: quantidade de valores incorreta em commands.txt
+[013] PASS: comando invalido b'RQ 0 1+1\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: quantidade de valores incorreta em commands.txt
+[014] PASS: comando invalido b'RQ 0 -1\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[015] PASS: comando invalido b'RQ 0 2147483648\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[016] PASS: comando invalido b'RQ -1 1\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[017] PASS: comando invalido b'RQ 1 1\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: cliente inexistente em commands.txt
+[018] PASS: comando invalido b'RL 0 1\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: RL tenta devolver mais recursos do que o cliente possui
+[019] PASS: comando invalido b'ZZ 0 1\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: comando inválido em commands.txt
+[020] PASS: comando invalido b'* extra\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: comando inválido em commands.txt
+[021] PASS: comando invalido b'RQ 0 1\x00bad\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: arquivo de entrada contém um caractere inválido
+[022] PASS: comando invalido b'RQ 0 1\nRL 0 2\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: RL tenta devolver mais recursos do que o cliente possui
+[023] PASS: customer invalido b''
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: customer.txt está vazio
+[024] PASS: customer invalido b'3,2\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: quantidade de valores incorreta em customer.txt
+[025] PASS: customer invalido b'\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[026] PASS: customer invalido b'-1\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[027] PASS: customer invalido b'2147483648\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[028] PASS: customer invalido b'3\x00bad\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: arquivo de entrada contém um caractere inválido
+[029] PASS: argumentos invalidos []
+  Comando: ./banker 
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: uso: ./banker <quantidade do recurso 1> ...
+[030] PASS: argumentos invalidos ['-1']
+  Comando: ./banker -1
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[031] PASS: argumentos invalidos ['x']
+  Comando: ./banker x
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[032] PASS: argumentos invalidos ['3x']
+  Comando: ./banker 3x
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: argumento de recurso inválido
+[033] PASS: argumentos invalidos ['2147483648']
+  Comando: ./banker 2147483648
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[034] PASS: argumentos invalidos ['9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999']
+  Comando: ./banker 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[035] PASS: argumentos invalidos ['3', '2']
+  Comando: ./banker 3 2
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: customer.txt deve separar os valores por vírgulas
+[036] PASS: customer ausente
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: customer.txt: No such file or directory
+[037] PASS: commands ausente
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: commands.txt: No such file or directory
+PASS: recusas, rollback, devolucoes, limites e entradas invalidas.
+[038] PASS: um cliente, sem quebra de linha final
+  Comando: ./banker 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 4eab79dd63b4bef1b59c4a648807d13827b65587d5dc5b0b199af6004eb4c67d
+[039] PASS: 2000 clientes e 32 tipos de recurso
+  Comando: ./banker 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 068a7feccdfd787d0b0de95d99f664b6f6defda9b6d3b5e4f61df949c1e2ce40
+[040] PASS: 1024 tipos e linhas maiores que 2000 caracteres
+  Comando: ./banker 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ce505e19aad5bd8571bf87f1d958046d25e3cd30796bed313a4480327fbdf4e7
+[041] PASS: 1000 ciclos de entrega integral e devolucao integral
+  Comando: ./banker 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 22b1f04fe768e043e77f79545527332c87b8cb572923ea06b411517506b8c787
+[042] PASS: oraculo 0
+  Comando: ./banker 0 4 8 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 3c8f64676599eda460830853799c906e12b392525451c1e52d2162efb8e27110
+[043] PASS: oraculo 1
+  Comando: ./banker 1 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 1ec5bd943c14f9c5fc5c9270054083d3a1268e714343262336b0a647a5813b29
+[044] PASS: oraculo 2
+  Comando: ./banker 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 83dc3dcc1b1383f77b1ed7d71e2db436895a9276aff7ba12b404666034a8548c
+[045] PASS: oraculo 3
+  Comando: ./banker 8 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f9446ab40e16b82f5a04e6519265f78e3d8062c51967adeefb0749094089c797
+[046] PASS: oraculo 4
+  Comando: ./banker 1 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a904c2a61d8d8920f0a1a118130bd48b4b6603982fc22eef5afef71b05d2f523
+[047] PASS: oraculo 5
+  Comando: ./banker 10 8 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: b72a43ba063a85ad74d5f9437ff56bd15e94afeb4ea2eecf9cd8b5e68f22f3b8
+[048] PASS: oraculo 6
+  Comando: ./banker 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f36c372ec5ea8945aac066dd4c83d15cd5b195c6a560fa02e8d0c87ad7401dfc
+[049] PASS: oraculo 7
+  Comando: ./banker 6 10 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: d83277ed9a3613f00060f072eb4eb4558083ada89977db30fddb03538fcabe1e
+[050] PASS: oraculo 8
+  Comando: ./banker 6 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 68172b9c14cf61daefcdd4184c374b9e45a5cb5fe88c921774bec29bfad8ea41
+[051] PASS: oraculo 9
+  Comando: ./banker 5 4 2 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 9841aae07e01d3d7f52e610ad83862e12d8faeac8eed9b82a867ecf1dfa53dc6
+[052] PASS: oraculo 10
+  Comando: ./banker 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 6a9ec610703ff9c4b320eb9f5dd0828260dbd0b47ac71c6fd8a32eaa29969f35
+[053] PASS: oraculo 11
+  Comando: ./banker 7 7 8 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: e117c75ef866138963983ed4244c56ca14e8df3765b2ebcadce65fc66fb25be1
+[054] PASS: oraculo 12
+  Comando: ./banker 10 8 10 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 5ab94f1f860c66f75822e3ff4c0d2db2eddd8e6b79753b38ff4a508199f94ba2
+[055] PASS: oraculo 13
+  Comando: ./banker 10 10 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 18e9ebb7dfb43c81730a3803071b915124d7a68b91b504c99510efe731c46c37
+[056] PASS: oraculo 14
+  Comando: ./banker 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c1f31c28a8c544ef4a3a6369e54c5ad85970ac641aba5fcc317810473bd0ad9e
+[057] PASS: oraculo 15
+  Comando: ./banker 8 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a6045aa26bd49dc9dcb9a890c4e66e07085e36ab187853c59c7fee9782706643
+[058] PASS: oraculo 16
+  Comando: ./banker 7 4 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a2aa0628b533e5d0d44ffafe6eea3960e212469f9c2a8760cec4f4730eade9a9
+[059] PASS: oraculo 17
+  Comando: ./banker 5 4 2 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 150be702d8acf6d6853cee9718013a61c2b5311115536a38a83cb01c459bc7b2
+[060] PASS: oraculo 18
+  Comando: ./banker 10 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 306a9655d8f9d48dc52ff1b3af0f51feb089cedcd771b7bccc672e3fc27e0737
+[061] PASS: oraculo 19
+  Comando: ./banker 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 15ebf7628a8357014dbb09adb4d2bb401c2b382870e98ea71f91f6902db83359
+[062] PASS: oraculo 20
+  Comando: ./banker 10 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0219e5ad3dd441d7bd0ca38b9aad37e39e31d35935d7aee5020c42be947a02f1
+[063] PASS: oraculo 21
+  Comando: ./banker 6 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a54ace5621916c5da442dc56e6b2be103f705ab366cf8cd7546b5c9342b57b48
+[064] PASS: oraculo 22
+  Comando: ./banker 0 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 9e482756bacbffde378d8973f5606d4c7df10713e2993e8a94d17f0d397404ff
+[065] PASS: oraculo 23
+  Comando: ./banker 0 9 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f3f87c387ca94c7375f54bed4895e5ccfeb22cda586851d5e1f030950d33504b
+[066] PASS: oraculo 24
+  Comando: ./banker 2 3 2 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ba664d80ae78ae754a05d04f888eae3b9f73840d7e531412a05b32b35d5685c8
+[067] PASS: oraculo 25
+  Comando: ./banker 3 4 10 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 3774526b61f925b312e9bb1ad6d731da9fc267cea33b56614dda2df18ee9652b
+[068] PASS: oraculo 26
+  Comando: ./banker 6 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a5bc096d594733c7efd37933c36fa10acb53270f5edbc495cb9af716e646856d
+[069] PASS: oraculo 27
+  Comando: ./banker 4 3 1 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: b4ae25e2283ff19b36d4261dac3161b33efccb7add7762f79da2aa8ae6bf2073
+[070] PASS: oraculo 28
+  Comando: ./banker 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: d31f98864bdb67c84f142d80e510615272e3ccfd538668cda201f202ff791a84
+[071] PASS: oraculo 29
+  Comando: ./banker 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 227c0f73ad82c8c413ca10a113d489d24dd89240d7783bb78410a79dfeab47a0
+[072] PASS: oraculo 30
+  Comando: ./banker 0 9 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c9745e2add669a2acb4a45d676ad103ad6193d5a6001653b4b0fe37075a576e3
+[073] PASS: oraculo 31
+  Comando: ./banker 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 343b755351cbd846c6af4289cd5abd5207b263f2c54b11aa11827937464328b6
+[074] PASS: oraculo 32
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 18b1d7fc636f6986b3b38a5dde51bcd527cfc001f028484207aa595d1dbc2b7f
+[075] PASS: oraculo 33
+  Comando: ./banker 4 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 96772a1439995d48bac5a910c805f53da058ee83876a74dabd962ebb60f9e068
+[076] PASS: oraculo 34
+  Comando: ./banker 0 3 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 83a77768cccf9c8aa9e15214f0527b46c4dc892e4206ad6f7106fdc168fd8279
+[077] PASS: oraculo 35
+  Comando: ./banker 5 2 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 5e1c5db95f24b7258da89a6cb8a43bd38792542ae8387222293ded53448ed12b
+[078] PASS: oraculo 36
+  Comando: ./banker 0 4 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 760d4ff10979191c9bc1d2fd6180d06c19b2c3e2afb25f8c3f216ee39e586504
+[079] PASS: oraculo 37
+  Comando: ./banker 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 14331bd4780b3f95ae4c8adf0f466167cda402e8d11f945fc6c3de946a4a364a
+[080] PASS: oraculo 38
+  Comando: ./banker 1 1 5 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 03c91e653538ce57d601ee4b2d1e8bd78389b902702676738b8f11ad14adff58
+[081] PASS: oraculo 39
+  Comando: ./banker 6 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a38dad762b534c93b95f67abe131990faadbf9b9a7bc6ccfe1e74477ed31706b
+[082] PASS: oraculo 40
+  Comando: ./banker 8 0 3 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0cb2391e2b7c4cf0e37682e641325284acdc2838c146c96719b24d3610c86228
+[083] PASS: oraculo 41
+  Comando: ./banker 3 2 6 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ceae65c9d4ca34be2d62b93e64128927e46e3bc8cdc7ec189d793556f34fab48
+[084] PASS: oraculo 42
+  Comando: ./banker 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: be367ed40ead415e7d71e8bc925e6d52b31ce5d1ff42409ba75bc53302bb87f1
+[085] PASS: oraculo 43
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f5f487fdff2bb5db7bccb3fc92502c764c9b18ba7517d2aedd92b35f1e399709
+[086] PASS: oraculo 44
+  Comando: ./banker 8 1 2 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f910bc9902ea696d1cf2e9f12d9a7da33ea0ad4e759a1f14605f6b86c798b136
+[087] PASS: oraculo 45
+  Comando: ./banker 7 4 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: b7c6be9212b371c8a97425e5577eae0ab3c5ae762e66c2312380f5e8b46ceb3f
+[088] PASS: oraculo 46
+  Comando: ./banker 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 1dffc0ee0b082eddcebf5f0f3f42b3dc6154a8d64a501a1eba5bf3bfa40e0f1b
+[089] PASS: oraculo 47
+  Comando: ./banker 6 8 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 530be9290d4a50c6a73f81941fbba3ec59e2e01e98810a996c659b6153e3f2e5
+[090] PASS: oraculo 48
+  Comando: ./banker 8 8 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 3152324337c7901aaf5b93c897dfa17df0c6faf50198fc78daa02c08d1dee432
+[091] PASS: oraculo 49
+  Comando: ./banker 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 695aaabb83afb2e16236ebee8b12c448a5a7f70dc960730a1d6e0ac229d9886a
+[092] PASS: oraculo 50
+  Comando: ./banker 5 10 3 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 8b0441d546410c3a36bb47128f1c0fd8902b361e1e85c5eebbdc0305f6ae42b3
+[093] PASS: oraculo 51
+  Comando: ./banker 8 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ec3b916c8961e85c3e84da338dfec02fb8a8f0b6bc8c1cfd25aabb20a1d7b1cf
+[094] PASS: oraculo 52
+  Comando: ./banker 8 7 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 9d12bd5611bac64dae5ef5103d5445269a265905aaf93e82eee7049a6bc4e937
+[095] PASS: oraculo 53
+  Comando: ./banker 8 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 753ec1e17db867990e10cb39592744d5b7e6ba40a2788bc4c0e2ddd79370153a
+[096] PASS: oraculo 54
+  Comando: ./banker 8 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 2a0b068b71fec8965d11d5b0d66005716cb0fd15b35945307b48c5396dc90ad8
+[097] PASS: oraculo 55
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 2353f3b18fb8f394c3c7ede5a7b652559766a708f78fe0f02510e43270df253b
+[098] PASS: oraculo 56
+  Comando: ./banker 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: b5751a5e8db744b5f7cba6f382bd6fc23ca91c4f649c63346df758c05c90b904
+[099] PASS: oraculo 57
+  Comando: ./banker 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 7afbe9791e0442beb0dcde44ba1d8ff519ea9e8bc0ea060ac1f27f2f85d23d3c
+[100] PASS: oraculo 58
+  Comando: ./banker 10 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: cfee8bf91984a2747824dfe91fc54f5b8e9d38f8639299c1a3ddf40b1c742f37
+[101] PASS: oraculo 59
+  Comando: ./banker 10 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 6b82a6d2031aa69d344609ba3555a8ef593ea3bc844f453b067a2a9a262ce24c
+[102] PASS: oraculo 60
+  Comando: ./banker 9 2 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 2a9282cbee35a65a1e54d8c6c2710c5f8233a93493d6efd8791d811c69d7e639
+[103] PASS: oraculo 61
+  Comando: ./banker 8 3 5 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0378f7b806b42dc949fc389b2b62cd5162af9037a7d129e3b5f6fc951e21166b
+[104] PASS: oraculo 62
+  Comando: ./banker 3 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: e287c17594bee06162e7c6a01b6fb4cf388c6d943604d5eadcfb097271562ffe
+[105] PASS: oraculo 63
+  Comando: ./banker 4 4 7 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 9d5d36ff6d20dde8267af2632c0f88792460731f8500987556186eef8af0df01
+[106] PASS: oraculo 64
+  Comando: ./banker 10 9 6 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 6bec305aa4e8b531e5a7d4c9c7bbc2951e1bcc402ad01dc6b65180985aa62156
+[107] PASS: oraculo 65
+  Comando: ./banker 4 8 3 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 1ed5013e314bcfdc9a4758b2d6433cc34be6ef258212b050e28ff9760e74e97f
+[108] PASS: oraculo 66
+  Comando: ./banker 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0f9779a5a37e638ea7722e265f3e4b1f9d08f6439e648eb3bb941413dfe2668a
+[109] PASS: oraculo 67
+  Comando: ./banker 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 849bd394004f507112b1e7c4145b72485172f60bb097336a328b5e8f970fa3f6
+[110] PASS: oraculo 68
+  Comando: ./banker 1 9 9 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: eb62ef936b0a657bb462cea101660650121c0825355c15a2d2514313e3fa6f17
+[111] PASS: oraculo 69
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 2f2c58f44bbd38fe695405a040adcfcfde1361462ddcad577f4d96be5000e0cd
+[112] PASS: oraculo 70
+  Comando: ./banker 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 8596bf3bc8e973f956adde5ce53599fe466211265202e8792fbbedab6dfe2b34
+[113] PASS: oraculo 71
+  Comando: ./banker 9 0 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 4af290fe2540030acc2c903789997b025accea11ffd13e5345c8eb9b671243a9
+[114] PASS: oraculo 72
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 06e13fb5332fcd66d55817e05aed954410260b384b1391ff45c25fc6aa976f3d
+[115] PASS: oraculo 73
+  Comando: ./banker 8 7 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 06791e13bb6f2f9034426d04e6e75b585e6796f40364135688cb46299783bf60
+[116] PASS: oraculo 74
+  Comando: ./banker 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ce02ffa6590fd006ef6dc6f6afd6d98d35f18647b5f2a37fd16431db7988c363
+[117] PASS: oraculo 75
+  Comando: ./banker 6 7 0 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 5a1828e5ee182ab539b49c7b9d1aba5615691d9f32631958e3facdbde7b698a5
+[118] PASS: oraculo 76
+  Comando: ./banker 6 3 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 2416fa86c351714570bc5fea4257528e3a0fb08fe1fcb729cf8d0b62e80b55f0
+[119] PASS: oraculo 77
+  Comando: ./banker 3 3 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: e8bc547da29e5192194550726fbdd507590735c5a66643fbabf90d3ee2cfaa4a
+[120] PASS: oraculo 78
+  Comando: ./banker 4 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 4533dc7b71f4d147cfcc00701825d9d2c09720db019618b01c81b406e16dc863
+[121] PASS: oraculo 79
+  Comando: ./banker 5 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 79cbd5c9060816ecca7ff060e70d20efce5fb84de3b57a3bc75a4ad66e579c26
+[122] PASS: oraculo 80
+  Comando: ./banker 8 6 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 45b0ad6d5c5c5828bf7688ff522a58eb42422a772ab01a5f89bf67204f0a42b4
+[123] PASS: oraculo 81
+  Comando: ./banker 8 8 6 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ab5bfebb1cadeb84a328579fe7b14367c4e44fa9566d4c14d83317e83a2091b6
+[124] PASS: oraculo 82
+  Comando: ./banker 8 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f4b8a90eab0338f31e3c6c6a9e2c0a9ac249d69779936b753ae1c6b768079c31
+[125] PASS: oraculo 83
+  Comando: ./banker 1 2 6 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 6f13a4f5b5a64b798466df97a1e008741df71838cb1d7025f66580ff956faf3f
+[126] PASS: oraculo 84
+  Comando: ./banker 7 0 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a2c8a2809daebc5785d3a3d3270b2e7b43a5a54c9e7960512ade581c892048e8
+[127] PASS: oraculo 85
+  Comando: ./banker 1 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 61167e409e2e68de39fbe382b6594eede08519d35045a026ab43e7143511672b
+[128] PASS: oraculo 86
+  Comando: ./banker 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 7de19915c6083e06f198b31bf97e1b5747c76aaecc7132f262b21e4049ee8b37
+[129] PASS: oraculo 87
+  Comando: ./banker 8 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: cfd404fb21a635aef3b918fb5283aee5ac224e48f01ac6b121fbdb018feac998
+[130] PASS: oraculo 88
+  Comando: ./banker 5 2 10 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 62486ceb5f5b76fcaaf90171ed6df2a6bc4c13aba2a85f4a205fc94fb27684d7
+[131] PASS: oraculo 89
+  Comando: ./banker 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: fcb8b6ebf8887fafc4c8af19c25c4767ce21edc88d5aac0b6a267522f6b2a1f4
+[132] PASS: oraculo 90
+  Comando: ./banker 7 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c2017438b51a2d96482e42a005b43b702c3619726e2282b7d1a44cb07f6dac35
+[133] PASS: oraculo 91
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: b17685262c33b19c5f715b78ae13646bb7d9f5d282846b358208e4c1489bb952
+[134] PASS: oraculo 92
+  Comando: ./banker 9 8 8 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0273e710981318f8c45f237732470d98e63413d9d0c2269bad560ab3e430bfc3
+[135] PASS: oraculo 93
+  Comando: ./banker 5 1 1 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c0e39500c0b4efe88f43424d834c24cb0fdc4f55a2513c703eafd8778c2d1824
+[136] PASS: oraculo 94
+  Comando: ./banker 4 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 56d970184daeb3d5aaa0fc20455594a466144fd66fc1a1c3538a0d22009ee1f0
+[137] PASS: oraculo 95
+  Comando: ./banker 0 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 53d3471e7ebdafb889b05896fe7c9d2f72d6c2472331a9a2bc739b06f16a8194
+[138] PASS: oraculo 96
+  Comando: ./banker 10 6 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 75eadb55c257f0395f1edfb78b8ae6f2905eaf72b17ca8928dcd182076d8e1d4
+[139] PASS: oraculo 97
+  Comando: ./banker 5 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 2447d9c5faada06bb767033de59f84e1a72810497566579df85e52b9d51d8a4a
+[140] PASS: oraculo 98
+  Comando: ./banker 0 5 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 446b88d2204ee1a4d0da4ea614f849604db47f35793cabed33745e7f841bf5bb
+[141] PASS: oraculo 99
+  Comando: ./banker 3 9 2 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: bc08cb981bf96b3673f1f12eeaec51ac0305ad691427709347c5070ac83476f7
+[142] PASS: oraculo 100
+  Comando: ./banker 7 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 093168247e8e4f9c3bb5f4183a4516b506d0faa58efef571f5d4cf7cfaa80769
+[143] PASS: oraculo 101
+  Comando: ./banker 5 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 53582290f57d906efa831d49a12ee279b9862f9312f49709fb9effc1c8b9da5d
+[144] PASS: oraculo 102
+  Comando: ./banker 5 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: cbf36e829133e31f8e9f5b37ff461c2e79a1b6f5000bade974c21676bbe40e2b
+[145] PASS: oraculo 103
+  Comando: ./banker 1 9 1 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 689ec2e9c849005bcef4d44be35704d9840d75bf63243c52ff239cbed1d84ec4
+[146] PASS: oraculo 104
+  Comando: ./banker 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 36c155c0a51790c1134a4b40eb34f6fc6f35fcd5a6f79db9de40950bf075a4c8
+[147] PASS: oraculo 105
+  Comando: ./banker 1 0 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 7b07c200522cf213af8e0be91964faa7548990296acb937f6325149f10ff1fc1
+[148] PASS: oraculo 106
+  Comando: ./banker 8 8 7 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 550620855bd14be2db3bb6adeb5fa1d6601a7f7d04c80d654cd7e8c356f86b44
+[149] PASS: oraculo 107
+  Comando: ./banker 9 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 7eab13d88b0de0372fd1a616006c8fb1203171039bc220239c635a35826ea649
+[150] PASS: oraculo 108
+  Comando: ./banker 10 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: bf68393139700b9b4c43d2b321aa8d127a850bf32844588c89b8bd5d9b76a884
+[151] PASS: oraculo 109
+  Comando: ./banker 7 7 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 9024bb11e2daa6b8f32cae94a0e0fcfb33049e9f7a7000561ec68335fba1d73f
+[152] PASS: oraculo 110
+  Comando: ./banker 3 6 7 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ea29d4148000beeaf644c905220121ac66ae9a9685c6086ba2791f474dce6d58
+[153] PASS: oraculo 111
+  Comando: ./banker 7 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f92968c554b337040d2b7e1ac6d4e1dd9f4f71cf910ebcc21c20cc452c9d8c6f
+[154] PASS: oraculo 112
+  Comando: ./banker 9 4 7 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 19f9e8a58c4ec163a12a46415be1088ba0fda080ac557f115deafa02b7e531e4
+[155] PASS: oraculo 113
+  Comando: ./banker 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c1ef7d4982e6207f7745eb89e6e4cc6bfe4d0cc51514764c766287a3d4293ff6
+[156] PASS: oraculo 114
+  Comando: ./banker 1 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 91d2a89e7bff27c70ed9162943ea0a8ac2cbe0209bb6666129dc5b24233c944b
+[157] PASS: oraculo 115
+  Comando: ./banker 1 8 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 282e23b1a617c21788f097789049aea7b4cdb74cdac018112954a4c8a342b356
+[158] PASS: oraculo 116
+  Comando: ./banker 10 1 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 3ad4169e89774bbf5a981701f354386e166c1c5d502267995314810d1fde2cb9
+[159] PASS: oraculo 117
+  Comando: ./banker 2 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 4f3f85b5af4561084816bacc0a492c8f8acfdd245606c79b2bd29ab8bb720605
+[160] PASS: oraculo 118
+  Comando: ./banker 1 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: d347b43f96d08b20818dc5578dd9ad0e039d2425c02bb96cd4d73285a76e4d48
+[161] PASS: oraculo 119
+  Comando: ./banker 8 10 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: b8859c98b155172e58126c10823cb448cb17f3f06f153163024291916ef503e4
+[162] PASS: oraculo 120
+  Comando: ./banker 10 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a7b7b7ba2bb4424fccaa29a53dccc6d508a82b4e5ae3b707b6aef4758a608235
+[163] PASS: oraculo 121
+  Comando: ./banker 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a76aad3d97343858fb5ff9efdb0d1fc2427c2960ea349effd66b1dbfc9ef89c2
+[164] PASS: oraculo 122
+  Comando: ./banker 4 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ddfcd68ce37618331abe403ea43bebcb492685078046be4b642325117b891a07
+[165] PASS: oraculo 123
+  Comando: ./banker 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 76d434b7f54b9ec22dd5d140967e8b4ac93b5336edd1cc58c827fcff3dc9ef61
+[166] PASS: oraculo 124
+  Comando: ./banker 0 2 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 72cad12f8f67d0b2b412e56708c678ae713539d648e21b70d24a9406884801ae
+[167] PASS: oraculo 125
+  Comando: ./banker 9 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c136961dc8313af31ee66cc63755bba02dee0282ec7b86cee7768477259abe9d
+[168] PASS: oraculo 126
+  Comando: ./banker 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: e9112aa25c714ad49c5b180df3c58c98624cb90320367c3e0e009f515323a5a2
+[169] PASS: oraculo 127
+  Comando: ./banker 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 66bd74a0dc8b188ec02597ce1e2b1247f19d680d669136315a3bcdf03cdd5034
+[170] PASS: oraculo 128
+  Comando: ./banker 8 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0e986c8a6820a2f237caa1ba2e1437495211cfc052dc2aa837a2fb4bcd5eae6f
+[171] PASS: oraculo 129
+  Comando: ./banker 6 10 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 299109eab558c0b43da02b3d0b9a69128225d618a29d8f6491281c138f123e92
+[172] PASS: oraculo 130
+  Comando: ./banker 10 7 10 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: fdd05deabb8a21c425014451f3bd3a72373ce6eff7e64d07b8963c0dc79f8483
+[173] PASS: oraculo 131
+  Comando: ./banker 8 1 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 71b4067f1c909a7a83bf923ebeb5431abffa8acab9f94e4a1dffcbefff771b01
+[174] PASS: oraculo 132
+  Comando: ./banker 6 0 2 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 2fabc4226f631d60141c6f65efc6be2ded760f522ab915b762754537475820ff
+[175] PASS: oraculo 133
+  Comando: ./banker 7 5 9 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f0a2ab5098d8993f32f72f6c43d91e31f0dd6a392b193b724dc9f3a574c83212
+[176] PASS: oraculo 134
+  Comando: ./banker 3 8 10 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: bbdd4523acd06a0b2e2833635c989d3877b69831a130a0c7cfe4b697459cc7b6
+[177] PASS: oraculo 135
+  Comando: ./banker 4 7 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 9541135ab2143467e507f456db2933c634641e0b98ef22a4bd54e6eccf007560
+[178] PASS: oraculo 136
+  Comando: ./banker 0 6 7 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 3914720eedb5ba9d9861c28ba856cabf99ae9c780e20b9c843ece21a776ad793
+[179] PASS: oraculo 137
+  Comando: ./banker 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: dbfdb2199f3814ad7eb773c59b97bf0369acc9c57e30054e2590cc5df026ba01
+[180] PASS: oraculo 138
+  Comando: ./banker 7 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 4c202b0ce72dfe23c074b3a4d55f1eb079addb21535f500244aba8cf604a6cff
+[181] PASS: oraculo 139
+  Comando: ./banker 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c0456c5681addaaf9f8af44b6e4851a520e1f743d45469ab75574e355f73f96d
+[182] PASS: oraculo 140
+  Comando: ./banker 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 767573cf1716c0e20cefe79c90e684ddbe2cc096acd0d790e13d38ba830dff96
+[183] PASS: oraculo 141
+  Comando: ./banker 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: d90df1cee383d948f9b189f8f3ec2497aea7611cba7077dc2b106ba87dafb8b2
+[184] PASS: oraculo 142
+  Comando: ./banker 7 4 5 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 5b05891d0c5bb8746c7a07de08f63590fa12b8515d7c3e7f8c4a28e71973c401
+[185] PASS: oraculo 143
+  Comando: ./banker 0 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 71bc86b2cbed643ab7b00b3e43054a294d8d6e6f175991465de42fef3caf3cd5
+[186] PASS: oraculo 144
+  Comando: ./banker 7 1 2 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: dfd18ae296649c9510c8bbc5df0478d35da90ba98ed34140c7cc2f77ba8396de
+[187] PASS: oraculo 145
+  Comando: ./banker 0 7 0 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 2d6b661e622b4053b3b7c28cb9af0a01a5a2c0fa05b77fa7182bffced30e8420
+[188] PASS: oraculo 146
+  Comando: ./banker 9 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: d76ba42b276ffcefb92675973d849faae8c3f90ad61a5acd839bbf6b9ba3f41a
+[189] PASS: oraculo 147
+  Comando: ./banker 7 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 4a0b626d80b577d192b6e6d4b3727092fefa4a3f791015c9c62c5f9b185237f1
+[190] PASS: oraculo 148
+  Comando: ./banker 10 6 5 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 930e9972fe1ce5e8119927ce9920f0400ffeb158a42df44b1d28a6f129686017
+[191] PASS: oraculo 149
+  Comando: ./banker 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: d2d54de047ee116e22a0cdfc68bc4e302893ce0fedce4800d4f0e156e939d84e
+[192] PASS: oraculo 150
+  Comando: ./banker 3 3 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 29ae7ad545764877b8ed6cdad9054b0860ce11c2e0860cd9e5b0971e89999889
+[193] PASS: oraculo 151
+  Comando: ./banker 5 4 5 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 716a207e8c87067370e422e1bb440d12ca2b1e38dcc0f2d85ff01137b864fa38
+[194] PASS: oraculo 152
+  Comando: ./banker 6 3 1 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 9e6a0c6b6cdb12f812d9ef8b5cbe0540f6d825a2c1041ebe89bfe4f9a7c53448
+[195] PASS: oraculo 153
+  Comando: ./banker 0 4 6 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: fcc9d46057086bb7e2ad4a3f5457469cc5fcad59a7d328a6899f84bea1497c10
+[196] PASS: oraculo 154
+  Comando: ./banker 7 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a63366ef7c085112016cc345d4c841c8021427ab415fcea3a84c444ba301b4c8
+[197] PASS: oraculo 155
+  Comando: ./banker 8 8 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 6c73ff5610cfb019b0157b81b932526ba76714aecef78b78da7567f97f8bf18c
+[198] PASS: oraculo 156
+  Comando: ./banker 3 5 2 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ffb0e9298575210ad55d2132c375421e2edd69281a835aba1455255fd5d01c65
+[199] PASS: oraculo 157
+  Comando: ./banker 2 0 0 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 98510e4946b3b7cd4eae1e5fed21aa3b88be58f9fa6dda88c4ad1f2953605a0b
+[200] PASS: oraculo 158
+  Comando: ./banker 0 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 9a30940843347940c56274ab6861b710a28dadb3ccb01040cf51174d154679f9
+[201] PASS: oraculo 159
+  Comando: ./banker 10 7 3 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 82e958ae9249d003fed6493858c568aa760781ec6e570f91a0374773d5a8d2cf
+[202] PASS: oraculo 160
+  Comando: ./banker 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 1ab9d3ca7550dbf85a676e84b36ee73ceeea1441d27d90b0533b021a6baa1f96
+[203] PASS: oraculo 161
+  Comando: ./banker 2 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: dee47bfafe2244284e2a2b9243e7bc6aea4e4c99b0816716a073487a9ab2e12e
+[204] PASS: oraculo 162
+  Comando: ./banker 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0d984e5c0c3d938601016a60810d636cb919bdbebb84083198abb98f169e8739
+[205] PASS: oraculo 163
+  Comando: ./banker 2 7 4 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ea31c59bfa9f66b7aadfcbc31bf884ea9e250466d92fa74aac6784da203001e8
+[206] PASS: oraculo 164
+  Comando: ./banker 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 1ddbd02ed284459649fb13e6845fbdf1f785b325a71b561a3a2dca84ad2f6b40
+[207] PASS: oraculo 165
+  Comando: ./banker 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c6e33e0f816a647219d7bac89f45683f6ab3675acee1e6f5f112f9615aecc2fc
+[208] PASS: oraculo 166
+  Comando: ./banker 6 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c3baf3cfc033a0d67d58f5418b68a6777e5352759a9d55d6d30a6ccbc22b17fd
+[209] PASS: oraculo 167
+  Comando: ./banker 5 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 6d5aeb30ae9a6542772d7185b840726ba13ee9d1fbf5e0774dcc69cb6a0292bc
+[210] PASS: oraculo 168
+  Comando: ./banker 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 786067278517ea0840e9260c1e36eaf37c7c18ea511f9b777abd521d9d764655
+[211] PASS: oraculo 169
+  Comando: ./banker 9 2 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0bb03b6cfb39739ab27fc63bac08240cf2964c160332cc6afeafb1288b7ce26a
+[212] PASS: oraculo 170
+  Comando: ./banker 5 5 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a867fd9a05fc5e4a2d3991d7f4334709718be090f169631054ef3ca59a8f1837
+[213] PASS: oraculo 171
+  Comando: ./banker 1 9 7 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 1a2b8911e41a0e39f09657d1d3ff8f65dc9bd548a68b5413148cb3f780fbd981
+[214] PASS: oraculo 172
+  Comando: ./banker 3 4 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 71ab03c9fa78d141743ec0ef52f88898d98c550a554bc7539abb2ead325264db
+[215] PASS: oraculo 173
+  Comando: ./banker 10 8 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 7fa36f56850980fdd27100a6333fc29bdb081c0a87767136d958796e4aa2963b
+[216] PASS: oraculo 174
+  Comando: ./banker 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: e4f9d060ff0cfa1f880a0fe3c4bdfad482563bcbe0b0899f7868e4db520900d2
+[217] PASS: oraculo 175
+  Comando: ./banker 0 9 8 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: d93fa7e3f71639b214b03e3dbca1464b68e3cbf5f2ca148acca18752d9d6a000
+[218] PASS: oraculo 176
+  Comando: ./banker 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a72bf20e97af348f9611375aa19d3849f6c6ba86a7fb1793628d859f14a694ef
+[219] PASS: oraculo 177
+  Comando: ./banker 6 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f255afcf693c2fdf3fdf2bd5a5d65cdf2584d78369bdf1b96bb3123bcfc823da
+[220] PASS: oraculo 178
+  Comando: ./banker 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 7b5f053e13496fd31c502fa7c6171604b2de8c725d87cbf900a1e938ae9e4f0a
+[221] PASS: oraculo 179
+  Comando: ./banker 1 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 076781c08f40a1677a1e167170578cb8527e39924b0749aec4f85dce9f73c560
+[222] PASS: oraculo 180
+  Comando: ./banker 10 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 92d2d5db52095c9712204dad0c6105f57b70b7b899ee60b3cd4f40c55d3a621a
+[223] PASS: oraculo 181
+  Comando: ./banker 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 8d8eefb5378dd270d6997f7c6e108e0d505dd70679fce4ca7e075e011dad2c29
+[224] PASS: oraculo 182
+  Comando: ./banker 3 3 5 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: b160a15cbf17ac20fb1f38584d10d101066d9b9c3329a7ae679c1e240511ff99
+[225] PASS: oraculo 183
+  Comando: ./banker 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 578d88e7759b6daf2f12fc0f6cd0f1807c715847fc0c9f2c65160d758bbcdad5
+[226] PASS: oraculo 184
+  Comando: ./banker 3 5 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 27c6a7ddc3606f1dc92b79a2d382237f27fd0efe800a4438efa59651a4c29a5b
+[227] PASS: oraculo 185
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 951758bb3fd1f62c541276de0f428fd109db85f9c75715078c409ae8e64b403d
+[228] PASS: oraculo 186
+  Comando: ./banker 8 7 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: d378654f21dcbf7b58ce5b920fc80908380c388fea9cef7a9ee13a96b7d2e345
+[229] PASS: oraculo 187
+  Comando: ./banker 9 2 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 7de0144d4e7a70f48540b5546c0423dbe4137b38114e2991ff48bf0dcd909734
+[230] PASS: oraculo 188
+  Comando: ./banker 0 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: e431fb5b974bfc0f7dbe387d325da0bff40a64caae62fa6b91f4d9d8c99d6bb5
+[231] PASS: oraculo 189
+  Comando: ./banker 2 9 8 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 90210bb4d0197bb7ef1526f1fc3bcc05fc8f3f846efc5c86738b6033a85cf006
+[232] PASS: oraculo 190
+  Comando: ./banker 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 5881397b1a1f586ec6ac6883d7a8bcc8bf0dbcfb4c03b2f3e384f84f9c806009
+[233] PASS: oraculo 191
+  Comando: ./banker 10 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f2c925d4b799ca42bedceba469a2aef60f9e59b35c3e183ea4ea756581c24d1c
+[234] PASS: oraculo 192
+  Comando: ./banker 1 7 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 4a9a26806f2c0c6bf2158771bd555a8dd0498f1c713359baa909c76277fd270e
+[235] PASS: oraculo 193
+  Comando: ./banker 4 8 4 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 51f42c151f19fb41a2d239f935dcb13d06ff33542cfd127cea8a2fcd0e944019
+[236] PASS: oraculo 194
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: aceeb37a5580b5e2a7b0d55555acd5ccfd15f03568075f1ba915592302a18af6
+[237] PASS: oraculo 195
+  Comando: ./banker 10 3 10 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 77391908d0941f8dc7b7194d516fdef6a662710f75495b8f402fa60fb4738e26
+[238] PASS: oraculo 196
+  Comando: ./banker 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ce6e46847a9f44f93cefa7aaba25987442f4523d44e3eaf8051ae827a872d847
+[239] PASS: oraculo 197
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0572a6a87159b3d0b660e6e098ffa733272d74d4e2178adff8e33b2094836084
+[240] PASS: oraculo 198
+  Comando: ./banker 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: e78694a9adc5505a58c5a8ba73f360c97b1ea045f02b9d2a263257ea00d0be5f
+[241] PASS: oraculo 199
+  Comando: ./banker 4 10 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 5ae4de2a0507d5e1dfb4e929728a3c1f0eb749711630963614b0fe682725b2f3
+PASS: 200 cenarios aleatorios, 7000 operacoes; estados conferidos apos cada operacao.
+PASS: decisoes conferidas com busca exaustiva das ordens de conclusao.
+PASS: falha de gravacao tratada e make clean remove apenas o executavel.
+TOTAL: 241 cenarios de entrada aprovados, mais verificacoes de falha de gravacao e make clean. Nenhum erro detectado pelo UBSan.
++ printf '\nTodos os testes desta sessao terminaram com sucesso.\n'
+
+Todos os testes desta sessao terminaram com sucesso.
+
+Script done on 2026-11-15 18:52:58-03:00 [COMMAND_EXIT_CODE="0"]
+Script started on 2026-11-15 18:54:24-03:00 [COMMAND="bash testes/executar_testes.sh " TERM="xterm-256color" TTY="/dev/pts/0" COLUMNS="154" LINES="14"]
++ date --iso-8601=seconds
+2026-11-15T18:54:24-03:00
++ uname -sr
+Linux 6.18.58.1-microsoft-standard-WSL2
++ gcc --version
++ head -n 1
+gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0
++ sha256sum banker.c Makefile testes/testar_banker.py
+c845830c31accfed749b982dfecf7a9a19b11a00fb2f764a7dece99296d4bd25  banker.c
+cfa2c73440fd3292a49ecc7599bd910b6880c5294263962f84d2ebd6a93d3920  Makefile
+62aa0c630ecd66da4b19111366ec878736cc4dc3a70ce03d4b1d8fee938d497d  testes/testar_banker.py
++ make clean
+rm -f banker
++ make
+gcc -std=c11 -Wall -Wextra -Wpedantic banker.c -o banker
++ ./banker 10 5 7
++ cmp result.txt testes/dados/result_esperado.txt
++ printf 'PASS: resultado do exemplo identico ao arquivo fornecido pelo professor.\n'
+PASS: resultado do exemplo identico ao arquivo fornecido pelo professor.
++ cat result.txt
+Allocate to customer 0 the resources 0 2 1
+Allocate to customer 2 the resources 3 0 2
+Allocate to customer 1 the resources 2 0 0
+Allocate to customer 4 the resources 0 0 2
+Release from customer 0 the resources 0 1 1
+Allocate to customer 3 the resources 2 1 1
+MAXIMUM   |   ALLOCATION  |   NEED
+7 5 3     |   0 1 0       |   7 4 3 
+3 2 2     |   2 0 0       |   1 2 2 
+9 0 2     |   3 0 2       |   6 0 0 
+2 2 2     |   2 1 1       |   0 1 1 
+4 3 3     |   0 0 2       |   4 3 1 
+AVAILABLE 3 3 2 
+The resources 3 3 2 are not enough to customer 4 request 4 0 0 
+Allocate to customer 1 the resources 1 0 2
+The customer 0 request 0 2 0 was denied because result in an unsafe state
+The customer 2 request 0 1 0 was denied because exceed its maximum allocation
++ make testar
+python3 testes/testar_banker.py
+Compilacao de verificacao: make com -Werror e UndefinedBehaviorSanitizer.
+PASS: compilacao sem avisos.
+[001] PASS: professor byte a byte
+  Comando: ./banker 10 5 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a8a6da37fc44011d184523b49970e24e760e663d16a997e20294cf164c09599f
+PASS: ./banker 10 5 7 gera result.txt identico ao fornecido pelo professor.
+[002] PASS: recusa insegura e restaura saldo
+  Comando: ./banker 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 82251d574c28b62ef44b6d7cab3380eb47d82b13925c909813123ff52d67432b
+[003] PASS: INT_MAX e devolucao integral
+  Comando: ./banker 2147483647
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 86e15c7da27785ff69043d4a5b1729e95c2d155b80424fa035d4900eb5fd8854
+[004] PASS: CRLF, tabulacoes e zero
+  Comando: ./banker 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 8a34fc9af9c5ca1740b2a70949283676277309b8ddd21d5e9806d35f43ed5686
+[005] PASS: sem comandos
+  Comando: ./banker 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+[006] PASS: comando invalido b'\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: comando inválido em commands.txt
+[007] PASS: comando invalido b'R'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: comando inválido em commands.txt
+[008] PASS: comando invalido b'RQ'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: separe os campos do comando por espaços
+[009] PASS: comando invalido b'RQ0 1\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: separe os campos do comando por espaços
+[010] PASS: comando invalido b'RQ 0\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[011] PASS: comando invalido b'RQ 0 1 2\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: quantidade de valores incorreta em commands.txt
+[012] PASS: comando invalido b'RQ 0 1x\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: quantidade de valores incorreta em commands.txt
+[013] PASS: comando invalido b'RQ 0 1+1\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: quantidade de valores incorreta em commands.txt
+[014] PASS: comando invalido b'RQ 0 -1\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[015] PASS: comando invalido b'RQ 0 2147483648\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[016] PASS: comando invalido b'RQ -1 1\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[017] PASS: comando invalido b'RQ 1 1\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: cliente inexistente em commands.txt
+[018] PASS: comando invalido b'RL 0 1\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: RL tenta devolver mais recursos do que o cliente possui
+[019] PASS: comando invalido b'ZZ 0 1\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: comando inválido em commands.txt
+[020] PASS: comando invalido b'* extra\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: comando inválido em commands.txt
+[021] PASS: comando invalido b'RQ 0 1\x00bad\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: arquivo de entrada contém um caractere inválido
+[022] PASS: comando invalido b'RQ 0 1\nRL 0 2\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: RL tenta devolver mais recursos do que o cliente possui
+[023] PASS: customer invalido b''
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: customer.txt está vazio
+[024] PASS: customer invalido b'3,2\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: quantidade de valores incorreta em customer.txt
+[025] PASS: customer invalido b'\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[026] PASS: customer invalido b'-1\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[027] PASS: customer invalido b'2147483648\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[028] PASS: customer invalido b'3\x00bad\n'
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: arquivo de entrada contém um caractere inválido
+[029] PASS: argumentos invalidos []
+  Comando: ./banker 
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: uso: ./banker <quantidade do recurso 1> ...
+[030] PASS: argumentos invalidos ['-1']
+  Comando: ./banker -1
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[031] PASS: argumentos invalidos ['x']
+  Comando: ./banker x
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[032] PASS: argumentos invalidos ['3x']
+  Comando: ./banker 3x
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: argumento de recurso inválido
+[033] PASS: argumentos invalidos ['2147483648']
+  Comando: ./banker 2147483648
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[034] PASS: argumentos invalidos ['9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999']
+  Comando: ./banker 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: esperado um inteiro não negativo dentro do limite de int
+[035] PASS: argumentos invalidos ['3', '2']
+  Comando: ./banker 3 2
+  Retorno: 1
+  Entrada invalida rejeitada: Erro: customer.txt deve separar os valores por vírgulas
+[036] PASS: customer ausente
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: customer.txt: No such file or directory
+[037] PASS: commands ausente
+  Comando: ./banker 3
+  Retorno: 1
+  Entrada invalida rejeitada: commands.txt: No such file or directory
+PASS: recusas, rollback, devolucoes, limites e entradas invalidas.
+[038] PASS: um cliente, sem quebra de linha final
+  Comando: ./banker 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 4eab79dd63b4bef1b59c4a648807d13827b65587d5dc5b0b199af6004eb4c67d
+[039] PASS: 2000 clientes e 32 tipos de recurso
+  Comando: ./banker 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000 2000
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 068a7feccdfd787d0b0de95d99f664b6f6defda9b6d3b5e4f61df949c1e2ce40
+[040] PASS: 1024 tipos e linhas maiores que 2000 caracteres
+  Comando: ./banker 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ce505e19aad5bd8571bf87f1d958046d25e3cd30796bed313a4480327fbdf4e7
+[041] PASS: 1000 ciclos de entrega integral e devolucao integral
+  Comando: ./banker 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 22b1f04fe768e043e77f79545527332c87b8cb572923ea06b411517506b8c787
+[042] PASS: oraculo 0
+  Comando: ./banker 0 4 8 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 3c8f64676599eda460830853799c906e12b392525451c1e52d2162efb8e27110
+[043] PASS: oraculo 1
+  Comando: ./banker 1 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 1ec5bd943c14f9c5fc5c9270054083d3a1268e714343262336b0a647a5813b29
+[044] PASS: oraculo 2
+  Comando: ./banker 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 83dc3dcc1b1383f77b1ed7d71e2db436895a9276aff7ba12b404666034a8548c
+[045] PASS: oraculo 3
+  Comando: ./banker 8 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f9446ab40e16b82f5a04e6519265f78e3d8062c51967adeefb0749094089c797
+[046] PASS: oraculo 4
+  Comando: ./banker 1 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a904c2a61d8d8920f0a1a118130bd48b4b6603982fc22eef5afef71b05d2f523
+[047] PASS: oraculo 5
+  Comando: ./banker 10 8 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: b72a43ba063a85ad74d5f9437ff56bd15e94afeb4ea2eecf9cd8b5e68f22f3b8
+[048] PASS: oraculo 6
+  Comando: ./banker 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f36c372ec5ea8945aac066dd4c83d15cd5b195c6a560fa02e8d0c87ad7401dfc
+[049] PASS: oraculo 7
+  Comando: ./banker 6 10 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: d83277ed9a3613f00060f072eb4eb4558083ada89977db30fddb03538fcabe1e
+[050] PASS: oraculo 8
+  Comando: ./banker 6 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 68172b9c14cf61daefcdd4184c374b9e45a5cb5fe88c921774bec29bfad8ea41
+[051] PASS: oraculo 9
+  Comando: ./banker 5 4 2 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 9841aae07e01d3d7f52e610ad83862e12d8faeac8eed9b82a867ecf1dfa53dc6
+[052] PASS: oraculo 10
+  Comando: ./banker 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 6a9ec610703ff9c4b320eb9f5dd0828260dbd0b47ac71c6fd8a32eaa29969f35
+[053] PASS: oraculo 11
+  Comando: ./banker 7 7 8 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: e117c75ef866138963983ed4244c56ca14e8df3765b2ebcadce65fc66fb25be1
+[054] PASS: oraculo 12
+  Comando: ./banker 10 8 10 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 5ab94f1f860c66f75822e3ff4c0d2db2eddd8e6b79753b38ff4a508199f94ba2
+[055] PASS: oraculo 13
+  Comando: ./banker 10 10 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 18e9ebb7dfb43c81730a3803071b915124d7a68b91b504c99510efe731c46c37
+[056] PASS: oraculo 14
+  Comando: ./banker 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c1f31c28a8c544ef4a3a6369e54c5ad85970ac641aba5fcc317810473bd0ad9e
+[057] PASS: oraculo 15
+  Comando: ./banker 8 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a6045aa26bd49dc9dcb9a890c4e66e07085e36ab187853c59c7fee9782706643
+[058] PASS: oraculo 16
+  Comando: ./banker 7 4 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a2aa0628b533e5d0d44ffafe6eea3960e212469f9c2a8760cec4f4730eade9a9
+[059] PASS: oraculo 17
+  Comando: ./banker 5 4 2 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 150be702d8acf6d6853cee9718013a61c2b5311115536a38a83cb01c459bc7b2
+[060] PASS: oraculo 18
+  Comando: ./banker 10 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 306a9655d8f9d48dc52ff1b3af0f51feb089cedcd771b7bccc672e3fc27e0737
+[061] PASS: oraculo 19
+  Comando: ./banker 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 15ebf7628a8357014dbb09adb4d2bb401c2b382870e98ea71f91f6902db83359
+[062] PASS: oraculo 20
+  Comando: ./banker 10 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0219e5ad3dd441d7bd0ca38b9aad37e39e31d35935d7aee5020c42be947a02f1
+[063] PASS: oraculo 21
+  Comando: ./banker 6 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a54ace5621916c5da442dc56e6b2be103f705ab366cf8cd7546b5c9342b57b48
+[064] PASS: oraculo 22
+  Comando: ./banker 0 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 9e482756bacbffde378d8973f5606d4c7df10713e2993e8a94d17f0d397404ff
+[065] PASS: oraculo 23
+  Comando: ./banker 0 9 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f3f87c387ca94c7375f54bed4895e5ccfeb22cda586851d5e1f030950d33504b
+[066] PASS: oraculo 24
+  Comando: ./banker 2 3 2 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ba664d80ae78ae754a05d04f888eae3b9f73840d7e531412a05b32b35d5685c8
+[067] PASS: oraculo 25
+  Comando: ./banker 3 4 10 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 3774526b61f925b312e9bb1ad6d731da9fc267cea33b56614dda2df18ee9652b
+[068] PASS: oraculo 26
+  Comando: ./banker 6 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a5bc096d594733c7efd37933c36fa10acb53270f5edbc495cb9af716e646856d
+[069] PASS: oraculo 27
+  Comando: ./banker 4 3 1 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: b4ae25e2283ff19b36d4261dac3161b33efccb7add7762f79da2aa8ae6bf2073
+[070] PASS: oraculo 28
+  Comando: ./banker 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: d31f98864bdb67c84f142d80e510615272e3ccfd538668cda201f202ff791a84
+[071] PASS: oraculo 29
+  Comando: ./banker 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 227c0f73ad82c8c413ca10a113d489d24dd89240d7783bb78410a79dfeab47a0
+[072] PASS: oraculo 30
+  Comando: ./banker 0 9 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c9745e2add669a2acb4a45d676ad103ad6193d5a6001653b4b0fe37075a576e3
+[073] PASS: oraculo 31
+  Comando: ./banker 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 343b755351cbd846c6af4289cd5abd5207b263f2c54b11aa11827937464328b6
+[074] PASS: oraculo 32
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 18b1d7fc636f6986b3b38a5dde51bcd527cfc001f028484207aa595d1dbc2b7f
+[075] PASS: oraculo 33
+  Comando: ./banker 4 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 96772a1439995d48bac5a910c805f53da058ee83876a74dabd962ebb60f9e068
+[076] PASS: oraculo 34
+  Comando: ./banker 0 3 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 83a77768cccf9c8aa9e15214f0527b46c4dc892e4206ad6f7106fdc168fd8279
+[077] PASS: oraculo 35
+  Comando: ./banker 5 2 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 5e1c5db95f24b7258da89a6cb8a43bd38792542ae8387222293ded53448ed12b
+[078] PASS: oraculo 36
+  Comando: ./banker 0 4 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 760d4ff10979191c9bc1d2fd6180d06c19b2c3e2afb25f8c3f216ee39e586504
+[079] PASS: oraculo 37
+  Comando: ./banker 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 14331bd4780b3f95ae4c8adf0f466167cda402e8d11f945fc6c3de946a4a364a
+[080] PASS: oraculo 38
+  Comando: ./banker 1 1 5 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 03c91e653538ce57d601ee4b2d1e8bd78389b902702676738b8f11ad14adff58
+[081] PASS: oraculo 39
+  Comando: ./banker 6 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a38dad762b534c93b95f67abe131990faadbf9b9a7bc6ccfe1e74477ed31706b
+[082] PASS: oraculo 40
+  Comando: ./banker 8 0 3 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0cb2391e2b7c4cf0e37682e641325284acdc2838c146c96719b24d3610c86228
+[083] PASS: oraculo 41
+  Comando: ./banker 3 2 6 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ceae65c9d4ca34be2d62b93e64128927e46e3bc8cdc7ec189d793556f34fab48
+[084] PASS: oraculo 42
+  Comando: ./banker 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: be367ed40ead415e7d71e8bc925e6d52b31ce5d1ff42409ba75bc53302bb87f1
+[085] PASS: oraculo 43
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f5f487fdff2bb5db7bccb3fc92502c764c9b18ba7517d2aedd92b35f1e399709
+[086] PASS: oraculo 44
+  Comando: ./banker 8 1 2 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f910bc9902ea696d1cf2e9f12d9a7da33ea0ad4e759a1f14605f6b86c798b136
+[087] PASS: oraculo 45
+  Comando: ./banker 7 4 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: b7c6be9212b371c8a97425e5577eae0ab3c5ae762e66c2312380f5e8b46ceb3f
+[088] PASS: oraculo 46
+  Comando: ./banker 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 1dffc0ee0b082eddcebf5f0f3f42b3dc6154a8d64a501a1eba5bf3bfa40e0f1b
+[089] PASS: oraculo 47
+  Comando: ./banker 6 8 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 530be9290d4a50c6a73f81941fbba3ec59e2e01e98810a996c659b6153e3f2e5
+[090] PASS: oraculo 48
+  Comando: ./banker 8 8 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 3152324337c7901aaf5b93c897dfa17df0c6faf50198fc78daa02c08d1dee432
+[091] PASS: oraculo 49
+  Comando: ./banker 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 695aaabb83afb2e16236ebee8b12c448a5a7f70dc960730a1d6e0ac229d9886a
+[092] PASS: oraculo 50
+  Comando: ./banker 5 10 3 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 8b0441d546410c3a36bb47128f1c0fd8902b361e1e85c5eebbdc0305f6ae42b3
+[093] PASS: oraculo 51
+  Comando: ./banker 8 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ec3b916c8961e85c3e84da338dfec02fb8a8f0b6bc8c1cfd25aabb20a1d7b1cf
+[094] PASS: oraculo 52
+  Comando: ./banker 8 7 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 9d12bd5611bac64dae5ef5103d5445269a265905aaf93e82eee7049a6bc4e937
+[095] PASS: oraculo 53
+  Comando: ./banker 8 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 753ec1e17db867990e10cb39592744d5b7e6ba40a2788bc4c0e2ddd79370153a
+[096] PASS: oraculo 54
+  Comando: ./banker 8 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 2a0b068b71fec8965d11d5b0d66005716cb0fd15b35945307b48c5396dc90ad8
+[097] PASS: oraculo 55
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 2353f3b18fb8f394c3c7ede5a7b652559766a708f78fe0f02510e43270df253b
+[098] PASS: oraculo 56
+  Comando: ./banker 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: b5751a5e8db744b5f7cba6f382bd6fc23ca91c4f649c63346df758c05c90b904
+[099] PASS: oraculo 57
+  Comando: ./banker 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 7afbe9791e0442beb0dcde44ba1d8ff519ea9e8bc0ea060ac1f27f2f85d23d3c
+[100] PASS: oraculo 58
+  Comando: ./banker 10 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: cfee8bf91984a2747824dfe91fc54f5b8e9d38f8639299c1a3ddf40b1c742f37
+[101] PASS: oraculo 59
+  Comando: ./banker 10 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 6b82a6d2031aa69d344609ba3555a8ef593ea3bc844f453b067a2a9a262ce24c
+[102] PASS: oraculo 60
+  Comando: ./banker 9 2 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 2a9282cbee35a65a1e54d8c6c2710c5f8233a93493d6efd8791d811c69d7e639
+[103] PASS: oraculo 61
+  Comando: ./banker 8 3 5 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0378f7b806b42dc949fc389b2b62cd5162af9037a7d129e3b5f6fc951e21166b
+[104] PASS: oraculo 62
+  Comando: ./banker 3 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: e287c17594bee06162e7c6a01b6fb4cf388c6d943604d5eadcfb097271562ffe
+[105] PASS: oraculo 63
+  Comando: ./banker 4 4 7 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 9d5d36ff6d20dde8267af2632c0f88792460731f8500987556186eef8af0df01
+[106] PASS: oraculo 64
+  Comando: ./banker 10 9 6 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 6bec305aa4e8b531e5a7d4c9c7bbc2951e1bcc402ad01dc6b65180985aa62156
+[107] PASS: oraculo 65
+  Comando: ./banker 4 8 3 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 1ed5013e314bcfdc9a4758b2d6433cc34be6ef258212b050e28ff9760e74e97f
+[108] PASS: oraculo 66
+  Comando: ./banker 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0f9779a5a37e638ea7722e265f3e4b1f9d08f6439e648eb3bb941413dfe2668a
+[109] PASS: oraculo 67
+  Comando: ./banker 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 849bd394004f507112b1e7c4145b72485172f60bb097336a328b5e8f970fa3f6
+[110] PASS: oraculo 68
+  Comando: ./banker 1 9 9 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: eb62ef936b0a657bb462cea101660650121c0825355c15a2d2514313e3fa6f17
+[111] PASS: oraculo 69
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 2f2c58f44bbd38fe695405a040adcfcfde1361462ddcad577f4d96be5000e0cd
+[112] PASS: oraculo 70
+  Comando: ./banker 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 8596bf3bc8e973f956adde5ce53599fe466211265202e8792fbbedab6dfe2b34
+[113] PASS: oraculo 71
+  Comando: ./banker 9 0 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 4af290fe2540030acc2c903789997b025accea11ffd13e5345c8eb9b671243a9
+[114] PASS: oraculo 72
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 06e13fb5332fcd66d55817e05aed954410260b384b1391ff45c25fc6aa976f3d
+[115] PASS: oraculo 73
+  Comando: ./banker 8 7 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 06791e13bb6f2f9034426d04e6e75b585e6796f40364135688cb46299783bf60
+[116] PASS: oraculo 74
+  Comando: ./banker 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ce02ffa6590fd006ef6dc6f6afd6d98d35f18647b5f2a37fd16431db7988c363
+[117] PASS: oraculo 75
+  Comando: ./banker 6 7 0 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 5a1828e5ee182ab539b49c7b9d1aba5615691d9f32631958e3facdbde7b698a5
+[118] PASS: oraculo 76
+  Comando: ./banker 6 3 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 2416fa86c351714570bc5fea4257528e3a0fb08fe1fcb729cf8d0b62e80b55f0
+[119] PASS: oraculo 77
+  Comando: ./banker 3 3 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: e8bc547da29e5192194550726fbdd507590735c5a66643fbabf90d3ee2cfaa4a
+[120] PASS: oraculo 78
+  Comando: ./banker 4 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 4533dc7b71f4d147cfcc00701825d9d2c09720db019618b01c81b406e16dc863
+[121] PASS: oraculo 79
+  Comando: ./banker 5 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 79cbd5c9060816ecca7ff060e70d20efce5fb84de3b57a3bc75a4ad66e579c26
+[122] PASS: oraculo 80
+  Comando: ./banker 8 6 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 45b0ad6d5c5c5828bf7688ff522a58eb42422a772ab01a5f89bf67204f0a42b4
+[123] PASS: oraculo 81
+  Comando: ./banker 8 8 6 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ab5bfebb1cadeb84a328579fe7b14367c4e44fa9566d4c14d83317e83a2091b6
+[124] PASS: oraculo 82
+  Comando: ./banker 8 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f4b8a90eab0338f31e3c6c6a9e2c0a9ac249d69779936b753ae1c6b768079c31
+[125] PASS: oraculo 83
+  Comando: ./banker 1 2 6 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 6f13a4f5b5a64b798466df97a1e008741df71838cb1d7025f66580ff956faf3f
+[126] PASS: oraculo 84
+  Comando: ./banker 7 0 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a2c8a2809daebc5785d3a3d3270b2e7b43a5a54c9e7960512ade581c892048e8
+[127] PASS: oraculo 85
+  Comando: ./banker 1 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 61167e409e2e68de39fbe382b6594eede08519d35045a026ab43e7143511672b
+[128] PASS: oraculo 86
+  Comando: ./banker 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 7de19915c6083e06f198b31bf97e1b5747c76aaecc7132f262b21e4049ee8b37
+[129] PASS: oraculo 87
+  Comando: ./banker 8 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: cfd404fb21a635aef3b918fb5283aee5ac224e48f01ac6b121fbdb018feac998
+[130] PASS: oraculo 88
+  Comando: ./banker 5 2 10 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 62486ceb5f5b76fcaaf90171ed6df2a6bc4c13aba2a85f4a205fc94fb27684d7
+[131] PASS: oraculo 89
+  Comando: ./banker 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: fcb8b6ebf8887fafc4c8af19c25c4767ce21edc88d5aac0b6a267522f6b2a1f4
+[132] PASS: oraculo 90
+  Comando: ./banker 7 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c2017438b51a2d96482e42a005b43b702c3619726e2282b7d1a44cb07f6dac35
+[133] PASS: oraculo 91
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: b17685262c33b19c5f715b78ae13646bb7d9f5d282846b358208e4c1489bb952
+[134] PASS: oraculo 92
+  Comando: ./banker 9 8 8 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0273e710981318f8c45f237732470d98e63413d9d0c2269bad560ab3e430bfc3
+[135] PASS: oraculo 93
+  Comando: ./banker 5 1 1 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c0e39500c0b4efe88f43424d834c24cb0fdc4f55a2513c703eafd8778c2d1824
+[136] PASS: oraculo 94
+  Comando: ./banker 4 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 56d970184daeb3d5aaa0fc20455594a466144fd66fc1a1c3538a0d22009ee1f0
+[137] PASS: oraculo 95
+  Comando: ./banker 0 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 53d3471e7ebdafb889b05896fe7c9d2f72d6c2472331a9a2bc739b06f16a8194
+[138] PASS: oraculo 96
+  Comando: ./banker 10 6 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 75eadb55c257f0395f1edfb78b8ae6f2905eaf72b17ca8928dcd182076d8e1d4
+[139] PASS: oraculo 97
+  Comando: ./banker 5 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 2447d9c5faada06bb767033de59f84e1a72810497566579df85e52b9d51d8a4a
+[140] PASS: oraculo 98
+  Comando: ./banker 0 5 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 446b88d2204ee1a4d0da4ea614f849604db47f35793cabed33745e7f841bf5bb
+[141] PASS: oraculo 99
+  Comando: ./banker 3 9 2 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: bc08cb981bf96b3673f1f12eeaec51ac0305ad691427709347c5070ac83476f7
+[142] PASS: oraculo 100
+  Comando: ./banker 7 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 093168247e8e4f9c3bb5f4183a4516b506d0faa58efef571f5d4cf7cfaa80769
+[143] PASS: oraculo 101
+  Comando: ./banker 5 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 53582290f57d906efa831d49a12ee279b9862f9312f49709fb9effc1c8b9da5d
+[144] PASS: oraculo 102
+  Comando: ./banker 5 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: cbf36e829133e31f8e9f5b37ff461c2e79a1b6f5000bade974c21676bbe40e2b
+[145] PASS: oraculo 103
+  Comando: ./banker 1 9 1 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 689ec2e9c849005bcef4d44be35704d9840d75bf63243c52ff239cbed1d84ec4
+[146] PASS: oraculo 104
+  Comando: ./banker 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 36c155c0a51790c1134a4b40eb34f6fc6f35fcd5a6f79db9de40950bf075a4c8
+[147] PASS: oraculo 105
+  Comando: ./banker 1 0 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 7b07c200522cf213af8e0be91964faa7548990296acb937f6325149f10ff1fc1
+[148] PASS: oraculo 106
+  Comando: ./banker 8 8 7 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 550620855bd14be2db3bb6adeb5fa1d6601a7f7d04c80d654cd7e8c356f86b44
+[149] PASS: oraculo 107
+  Comando: ./banker 9 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 7eab13d88b0de0372fd1a616006c8fb1203171039bc220239c635a35826ea649
+[150] PASS: oraculo 108
+  Comando: ./banker 10 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: bf68393139700b9b4c43d2b321aa8d127a850bf32844588c89b8bd5d9b76a884
+[151] PASS: oraculo 109
+  Comando: ./banker 7 7 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 9024bb11e2daa6b8f32cae94a0e0fcfb33049e9f7a7000561ec68335fba1d73f
+[152] PASS: oraculo 110
+  Comando: ./banker 3 6 7 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ea29d4148000beeaf644c905220121ac66ae9a9685c6086ba2791f474dce6d58
+[153] PASS: oraculo 111
+  Comando: ./banker 7 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f92968c554b337040d2b7e1ac6d4e1dd9f4f71cf910ebcc21c20cc452c9d8c6f
+[154] PASS: oraculo 112
+  Comando: ./banker 9 4 7 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 19f9e8a58c4ec163a12a46415be1088ba0fda080ac557f115deafa02b7e531e4
+[155] PASS: oraculo 113
+  Comando: ./banker 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c1ef7d4982e6207f7745eb89e6e4cc6bfe4d0cc51514764c766287a3d4293ff6
+[156] PASS: oraculo 114
+  Comando: ./banker 1 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 91d2a89e7bff27c70ed9162943ea0a8ac2cbe0209bb6666129dc5b24233c944b
+[157] PASS: oraculo 115
+  Comando: ./banker 1 8 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 282e23b1a617c21788f097789049aea7b4cdb74cdac018112954a4c8a342b356
+[158] PASS: oraculo 116
+  Comando: ./banker 10 1 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 3ad4169e89774bbf5a981701f354386e166c1c5d502267995314810d1fde2cb9
+[159] PASS: oraculo 117
+  Comando: ./banker 2 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 4f3f85b5af4561084816bacc0a492c8f8acfdd245606c79b2bd29ab8bb720605
+[160] PASS: oraculo 118
+  Comando: ./banker 1 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: d347b43f96d08b20818dc5578dd9ad0e039d2425c02bb96cd4d73285a76e4d48
+[161] PASS: oraculo 119
+  Comando: ./banker 8 10 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: b8859c98b155172e58126c10823cb448cb17f3f06f153163024291916ef503e4
+[162] PASS: oraculo 120
+  Comando: ./banker 10 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a7b7b7ba2bb4424fccaa29a53dccc6d508a82b4e5ae3b707b6aef4758a608235
+[163] PASS: oraculo 121
+  Comando: ./banker 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a76aad3d97343858fb5ff9efdb0d1fc2427c2960ea349effd66b1dbfc9ef89c2
+[164] PASS: oraculo 122
+  Comando: ./banker 4 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ddfcd68ce37618331abe403ea43bebcb492685078046be4b642325117b891a07
+[165] PASS: oraculo 123
+  Comando: ./banker 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 76d434b7f54b9ec22dd5d140967e8b4ac93b5336edd1cc58c827fcff3dc9ef61
+[166] PASS: oraculo 124
+  Comando: ./banker 0 2 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 72cad12f8f67d0b2b412e56708c678ae713539d648e21b70d24a9406884801ae
+[167] PASS: oraculo 125
+  Comando: ./banker 9 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c136961dc8313af31ee66cc63755bba02dee0282ec7b86cee7768477259abe9d
+[168] PASS: oraculo 126
+  Comando: ./banker 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: e9112aa25c714ad49c5b180df3c58c98624cb90320367c3e0e009f515323a5a2
+[169] PASS: oraculo 127
+  Comando: ./banker 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 66bd74a0dc8b188ec02597ce1e2b1247f19d680d669136315a3bcdf03cdd5034
+[170] PASS: oraculo 128
+  Comando: ./banker 8 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0e986c8a6820a2f237caa1ba2e1437495211cfc052dc2aa837a2fb4bcd5eae6f
+[171] PASS: oraculo 129
+  Comando: ./banker 6 10 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 299109eab558c0b43da02b3d0b9a69128225d618a29d8f6491281c138f123e92
+[172] PASS: oraculo 130
+  Comando: ./banker 10 7 10 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: fdd05deabb8a21c425014451f3bd3a72373ce6eff7e64d07b8963c0dc79f8483
+[173] PASS: oraculo 131
+  Comando: ./banker 8 1 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 71b4067f1c909a7a83bf923ebeb5431abffa8acab9f94e4a1dffcbefff771b01
+[174] PASS: oraculo 132
+  Comando: ./banker 6 0 2 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 2fabc4226f631d60141c6f65efc6be2ded760f522ab915b762754537475820ff
+[175] PASS: oraculo 133
+  Comando: ./banker 7 5 9 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f0a2ab5098d8993f32f72f6c43d91e31f0dd6a392b193b724dc9f3a574c83212
+[176] PASS: oraculo 134
+  Comando: ./banker 3 8 10 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: bbdd4523acd06a0b2e2833635c989d3877b69831a130a0c7cfe4b697459cc7b6
+[177] PASS: oraculo 135
+  Comando: ./banker 4 7 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 9541135ab2143467e507f456db2933c634641e0b98ef22a4bd54e6eccf007560
+[178] PASS: oraculo 136
+  Comando: ./banker 0 6 7 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 3914720eedb5ba9d9861c28ba856cabf99ae9c780e20b9c843ece21a776ad793
+[179] PASS: oraculo 137
+  Comando: ./banker 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: dbfdb2199f3814ad7eb773c59b97bf0369acc9c57e30054e2590cc5df026ba01
+[180] PASS: oraculo 138
+  Comando: ./banker 7 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 4c202b0ce72dfe23c074b3a4d55f1eb079addb21535f500244aba8cf604a6cff
+[181] PASS: oraculo 139
+  Comando: ./banker 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c0456c5681addaaf9f8af44b6e4851a520e1f743d45469ab75574e355f73f96d
+[182] PASS: oraculo 140
+  Comando: ./banker 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 767573cf1716c0e20cefe79c90e684ddbe2cc096acd0d790e13d38ba830dff96
+[183] PASS: oraculo 141
+  Comando: ./banker 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: d90df1cee383d948f9b189f8f3ec2497aea7611cba7077dc2b106ba87dafb8b2
+[184] PASS: oraculo 142
+  Comando: ./banker 7 4 5 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 5b05891d0c5bb8746c7a07de08f63590fa12b8515d7c3e7f8c4a28e71973c401
+[185] PASS: oraculo 143
+  Comando: ./banker 0 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 71bc86b2cbed643ab7b00b3e43054a294d8d6e6f175991465de42fef3caf3cd5
+[186] PASS: oraculo 144
+  Comando: ./banker 7 1 2 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: dfd18ae296649c9510c8bbc5df0478d35da90ba98ed34140c7cc2f77ba8396de
+[187] PASS: oraculo 145
+  Comando: ./banker 0 7 0 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 2d6b661e622b4053b3b7c28cb9af0a01a5a2c0fa05b77fa7182bffced30e8420
+[188] PASS: oraculo 146
+  Comando: ./banker 9 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: d76ba42b276ffcefb92675973d849faae8c3f90ad61a5acd839bbf6b9ba3f41a
+[189] PASS: oraculo 147
+  Comando: ./banker 7 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 4a0b626d80b577d192b6e6d4b3727092fefa4a3f791015c9c62c5f9b185237f1
+[190] PASS: oraculo 148
+  Comando: ./banker 10 6 5 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 930e9972fe1ce5e8119927ce9920f0400ffeb158a42df44b1d28a6f129686017
+[191] PASS: oraculo 149
+  Comando: ./banker 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: d2d54de047ee116e22a0cdfc68bc4e302893ce0fedce4800d4f0e156e939d84e
+[192] PASS: oraculo 150
+  Comando: ./banker 3 3 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 29ae7ad545764877b8ed6cdad9054b0860ce11c2e0860cd9e5b0971e89999889
+[193] PASS: oraculo 151
+  Comando: ./banker 5 4 5 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 716a207e8c87067370e422e1bb440d12ca2b1e38dcc0f2d85ff01137b864fa38
+[194] PASS: oraculo 152
+  Comando: ./banker 6 3 1 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 9e6a0c6b6cdb12f812d9ef8b5cbe0540f6d825a2c1041ebe89bfe4f9a7c53448
+[195] PASS: oraculo 153
+  Comando: ./banker 0 4 6 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: fcc9d46057086bb7e2ad4a3f5457469cc5fcad59a7d328a6899f84bea1497c10
+[196] PASS: oraculo 154
+  Comando: ./banker 7 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a63366ef7c085112016cc345d4c841c8021427ab415fcea3a84c444ba301b4c8
+[197] PASS: oraculo 155
+  Comando: ./banker 8 8 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 6c73ff5610cfb019b0157b81b932526ba76714aecef78b78da7567f97f8bf18c
+[198] PASS: oraculo 156
+  Comando: ./banker 3 5 2 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ffb0e9298575210ad55d2132c375421e2edd69281a835aba1455255fd5d01c65
+[199] PASS: oraculo 157
+  Comando: ./banker 2 0 0 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 98510e4946b3b7cd4eae1e5fed21aa3b88be58f9fa6dda88c4ad1f2953605a0b
+[200] PASS: oraculo 158
+  Comando: ./banker 0 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 9a30940843347940c56274ab6861b710a28dadb3ccb01040cf51174d154679f9
+[201] PASS: oraculo 159
+  Comando: ./banker 10 7 3 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 82e958ae9249d003fed6493858c568aa760781ec6e570f91a0374773d5a8d2cf
+[202] PASS: oraculo 160
+  Comando: ./banker 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 1ab9d3ca7550dbf85a676e84b36ee73ceeea1441d27d90b0533b021a6baa1f96
+[203] PASS: oraculo 161
+  Comando: ./banker 2 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: dee47bfafe2244284e2a2b9243e7bc6aea4e4c99b0816716a073487a9ab2e12e
+[204] PASS: oraculo 162
+  Comando: ./banker 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0d984e5c0c3d938601016a60810d636cb919bdbebb84083198abb98f169e8739
+[205] PASS: oraculo 163
+  Comando: ./banker 2 7 4 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ea31c59bfa9f66b7aadfcbc31bf884ea9e250466d92fa74aac6784da203001e8
+[206] PASS: oraculo 164
+  Comando: ./banker 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 1ddbd02ed284459649fb13e6845fbdf1f785b325a71b561a3a2dca84ad2f6b40
+[207] PASS: oraculo 165
+  Comando: ./banker 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c6e33e0f816a647219d7bac89f45683f6ab3675acee1e6f5f112f9615aecc2fc
+[208] PASS: oraculo 166
+  Comando: ./banker 6 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: c3baf3cfc033a0d67d58f5418b68a6777e5352759a9d55d6d30a6ccbc22b17fd
+[209] PASS: oraculo 167
+  Comando: ./banker 5 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 6d5aeb30ae9a6542772d7185b840726ba13ee9d1fbf5e0774dcc69cb6a0292bc
+[210] PASS: oraculo 168
+  Comando: ./banker 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 786067278517ea0840e9260c1e36eaf37c7c18ea511f9b777abd521d9d764655
+[211] PASS: oraculo 169
+  Comando: ./banker 9 2 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0bb03b6cfb39739ab27fc63bac08240cf2964c160332cc6afeafb1288b7ce26a
+[212] PASS: oraculo 170
+  Comando: ./banker 5 5 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a867fd9a05fc5e4a2d3991d7f4334709718be090f169631054ef3ca59a8f1837
+[213] PASS: oraculo 171
+  Comando: ./banker 1 9 7 10
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 1a2b8911e41a0e39f09657d1d3ff8f65dc9bd548a68b5413148cb3f780fbd981
+[214] PASS: oraculo 172
+  Comando: ./banker 3 4 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 71ab03c9fa78d141743ec0ef52f88898d98c550a554bc7539abb2ead325264db
+[215] PASS: oraculo 173
+  Comando: ./banker 10 8 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 7fa36f56850980fdd27100a6333fc29bdb081c0a87767136d958796e4aa2963b
+[216] PASS: oraculo 174
+  Comando: ./banker 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: e4f9d060ff0cfa1f880a0fe3c4bdfad482563bcbe0b0899f7868e4db520900d2
+[217] PASS: oraculo 175
+  Comando: ./banker 0 9 8 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: d93fa7e3f71639b214b03e3dbca1464b68e3cbf5f2ca148acca18752d9d6a000
+[218] PASS: oraculo 176
+  Comando: ./banker 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: a72bf20e97af348f9611375aa19d3849f6c6ba86a7fb1793628d859f14a694ef
+[219] PASS: oraculo 177
+  Comando: ./banker 6 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f255afcf693c2fdf3fdf2bd5a5d65cdf2584d78369bdf1b96bb3123bcfc823da
+[220] PASS: oraculo 178
+  Comando: ./banker 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 7b5f053e13496fd31c502fa7c6171604b2de8c725d87cbf900a1e938ae9e4f0a
+[221] PASS: oraculo 179
+  Comando: ./banker 1 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 076781c08f40a1677a1e167170578cb8527e39924b0749aec4f85dce9f73c560
+[222] PASS: oraculo 180
+  Comando: ./banker 10 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 92d2d5db52095c9712204dad0c6105f57b70b7b899ee60b3cd4f40c55d3a621a
+[223] PASS: oraculo 181
+  Comando: ./banker 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 8d8eefb5378dd270d6997f7c6e108e0d505dd70679fce4ca7e075e011dad2c29
+[224] PASS: oraculo 182
+  Comando: ./banker 3 3 5 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: b160a15cbf17ac20fb1f38584d10d101066d9b9c3329a7ae679c1e240511ff99
+[225] PASS: oraculo 183
+  Comando: ./banker 0
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 578d88e7759b6daf2f12fc0f6cd0f1807c715847fc0c9f2c65160d758bbcdad5
+[226] PASS: oraculo 184
+  Comando: ./banker 3 5 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 27c6a7ddc3606f1dc92b79a2d382237f27fd0efe800a4438efa59651a4c29a5b
+[227] PASS: oraculo 185
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 951758bb3fd1f62c541276de0f428fd109db85f9c75715078c409ae8e64b403d
+[228] PASS: oraculo 186
+  Comando: ./banker 8 7 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: d378654f21dcbf7b58ce5b920fc80908380c388fea9cef7a9ee13a96b7d2e345
+[229] PASS: oraculo 187
+  Comando: ./banker 9 2 9
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 7de0144d4e7a70f48540b5546c0423dbe4137b38114e2991ff48bf0dcd909734
+[230] PASS: oraculo 188
+  Comando: ./banker 0 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: e431fb5b974bfc0f7dbe387d325da0bff40a64caae62fa6b91f4d9d8c99d6bb5
+[231] PASS: oraculo 189
+  Comando: ./banker 2 9 8 1
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 90210bb4d0197bb7ef1526f1fc3bcc05fc8f3f846efc5c86738b6033a85cf006
+[232] PASS: oraculo 190
+  Comando: ./banker 5
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 5881397b1a1f586ec6ac6883d7a8bcc8bf0dbcfb4c03b2f3e384f84f9c806009
+[233] PASS: oraculo 191
+  Comando: ./banker 10 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: f2c925d4b799ca42bedceba469a2aef60f9e59b35c3e183ea4ea756581c24d1c
+[234] PASS: oraculo 192
+  Comando: ./banker 1 7 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 4a9a26806f2c0c6bf2158771bd555a8dd0498f1c713359baa909c76277fd270e
+[235] PASS: oraculo 193
+  Comando: ./banker 4 8 4 8
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 51f42c151f19fb41a2d239f935dcb13d06ff33542cfd127cea8a2fcd0e944019
+[236] PASS: oraculo 194
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: aceeb37a5580b5e2a7b0d55555acd5ccfd15f03568075f1ba915592302a18af6
+[237] PASS: oraculo 195
+  Comando: ./banker 10 3 10 3
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 77391908d0941f8dc7b7194d516fdef6a662710f75495b8f402fa60fb4738e26
+[238] PASS: oraculo 196
+  Comando: ./banker 6
+  Retorno: 0
+  Saida igual ao esperado; SHA256: ce6e46847a9f44f93cefa7aaba25987442f4523d44e3eaf8051ae827a872d847
+[239] PASS: oraculo 197
+  Comando: ./banker 2
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 0572a6a87159b3d0b660e6e098ffa733272d74d4e2178adff8e33b2094836084
+[240] PASS: oraculo 198
+  Comando: ./banker 7
+  Retorno: 0
+  Saida igual ao esperado; SHA256: e78694a9adc5505a58c5a8ba73f360c97b1ea045f02b9d2a263257ea00d0be5f
+[241] PASS: oraculo 199
+  Comando: ./banker 4 10 4
+  Retorno: 0
+  Saida igual ao esperado; SHA256: 5ae4de2a0507d5e1dfb4e929728a3c1f0eb749711630963614b0fe682725b2f3
+PASS: 200 cenarios aleatorios, 7000 operacoes; estados conferidos apos cada operacao.
+PASS: decisoes conferidas com busca exaustiva das ordens de conclusao.
+PASS: falha de gravacao tratada e make clean remove apenas o executavel.
+TOTAL: 241 cenarios de entrada aprovados, mais verificacoes de falha de gravacao e make clean. Nenhum erro detectado pelo UBSan.
++ printf '\nTodos os testes desta sessao terminaram com sucesso.\n'
+
+Todos os testes desta sessao terminaram com sucesso.
+
+Script done on 2026-11-15 18:54:26-03:00 [COMMAND_EXIT_CODE="0"]
